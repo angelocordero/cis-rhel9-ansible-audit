@@ -1,0 +1,21 @@
+#!/bin/bash
+
+FOLDER_PATH="logs"
+SEARCH_TEXT="## Count Summary"
+
+for FILE in "$FOLDER_PATH"/*
+do
+    if [ -f "$FILE" ]; then
+        COMPLIANT=$(grep -c 'Compliant' $FILE)
+        NOT_COMPLIANT=$(grep -c 'Not Compliant' $FILE)
+        WARNING=$(grep -c 'Warning' $FILE)
+        UNKNOWN=$(grep -c 'Unknown' $FILE)
+
+        # Create the text to append
+       APPEND_TEXT="| Status | Count |\\n| --- | --- |\\n| Compliant | $(($COMPLIANT - $NOT_COMPLIANT)) |\\n| Not Compliant | ${NOT_COMPLIANT} |\\n| Warning | ${WARNING} |\\n| Unknown | ${UNKNOWN} |\\n| Total | $(($COMPLIANT + $WARNING + $UNKNOWN)) |"
+               
+        # Append the text right after the search text
+        sed -i "/$SEARCH_TEXT/a $APPEND_TEXT" "$FILE"
+
+    fi
+done

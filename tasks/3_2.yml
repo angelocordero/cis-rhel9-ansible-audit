@@ -1,0 +1,51 @@
+- name: Network Parameters (Host Only)
+  block: 
+    - name: 3.2.1 Ensure IP forwarding is disabled
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/3_2_1"
+            dest: "/tmp/audit/3_2_1"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/3_2_1
+
+        - name: Run audit script
+          shell: /tmp/audit/3_2_1
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "3.2.1 | {{ compliance_status }}"
+            result: "### 3.2.1 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 3.2.2 Ensure packet redirect sending is disabled (Automated)
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/3_2_2"
+            dest: "/tmp/audit/3_2_2"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/3_2_2
+
+        - name: Run audit script
+          shell: /tmp/audit/3_2_2
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "3.2.2 | {{ compliance_status }}"
+            result: "### 3.2.2 \n```{{ audit_output.stdout }}\n```\n"

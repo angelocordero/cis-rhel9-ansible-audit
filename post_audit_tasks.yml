@@ -1,0 +1,9 @@
+---
+- name: Post Benchmark Tasks
+  hosts: localhost
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Execute post audit script
+    shell: ./scripts/post-audit-script
+

@@ -1,0 +1,30 @@
+- name: Ensure log files exists
+  local_action:
+    module: file
+    path: logs/output_log_{{ ansible_hostname }}.md
+    state: touch
+    mode: '0755'
+
+- name: Initialize output log files
+  local_action: 
+    module: copy
+    content: |
+      # CIS Redhat Enterprise Linux 9 Audit Results
+          
+      #### Hostname: {{ ansible_hostname }}
+      
+      #### Timestamp: {{ ansible_date_time.iso8601 | regex_replace('T', ' ') | regex_replace('\..*', '') }}
+
+      | Recommendation # | Compliance Status |
+      | --- | --- |
+      ## Count Summary
+
+      ## Audit Failure Outputs
+
+    dest: logs/output_log_{{ ansible_hostname }}.md
+
+- name: Create /tmp/audit folder
+  file:
+    path: /tmp/audit
+    state: directory
+    mode: '0755'

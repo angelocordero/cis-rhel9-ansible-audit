@@ -1,0 +1,22 @@
+- name: 1.2.2 Ensure gpgcheck is globally activated
+  block:
+  - name: Check global configuration 
+    shell: grep ^gpgcheck /etc/dnf/dnf.conf
+    register: global_output
+    failed_when: "audit_output.rc == 2"
+    check_mode: no
+
+  - name: Check configuration in yum.repos.d
+    shell: grep -P "^gpgcheck\h*=\h*[^1].*\h*$" /etc/yum.repos.d/*
+    register: output
+    failed_when: "audit_output.rc == 2"
+    check_mode: no
+   
+  - name: Set compliance status
+    set_fact:
+      compliance_status: "{{ 'Compliant' if output.stdout == '' and global_output == 'gpgcheck=1' else 'Not Compliant' }}"
+
+  - name: Log to file
+    include_tasks: ../logging.yml
+    vars:
+      status: "1.1.2 | {{ compliance_status }}"

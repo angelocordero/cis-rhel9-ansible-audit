@@ -1,0 +1,220 @@
+- name: GNOME Display Manager
+  block:
+    - name: 1.8.2 Ensure GDM login banner is configured
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/1_8_2"
+            dest: "/tmp/audit/1_8_2"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/1_8_2
+
+        - name: Run audit script
+          shell: /tmp/audit/1_8_2
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.8.2 | {{ compliance_status }}"
+            result: "### 1.8.2 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 1.8.3 Ensure GDM disable-user-list option is enabled
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/1_8_3"
+            dest: "/tmp/audit/1_8_3"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/1_8_3
+
+        - name: Run audit script
+          shell: /tmp/audit/1_8_3
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.8.3 | {{ compliance_status }}"
+            result: "### 1.8.3 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 1.8.4 Ensure GDM screen locks when the user is idle
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/1_8_4"
+            dest: "/tmp/audit/1_8_4"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/1_8_4
+
+        - name: Run audit script
+          shell: /tmp/audit/1_8_4
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.8.4 | {{ compliance_status }}"
+            result: "### 1.8.4 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 1.8.5 Ensure GDM screen locks cannot be overridden
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/1_8_5"
+            dest: "/tmp/audit/1_8_5"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/1_8_5
+
+        - name: Run audit script
+          shell: /tmp/audit/1_8_5
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.8.5 | {{ compliance_status }}"
+            result: "### 1.8.5 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 1.8.6 Ensure GDM automatic mounting of removable media is disabled
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/1_8_6"
+            dest: "/tmp/audit/1_8_6"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/1_8_6
+
+        - name: Run audit script
+          shell: /tmp/audit/1_8_6
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.8.6 | {{ compliance_status }}"
+            result: "### 1.8.6 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 1.8.7 Ensure GDM disabling automatic mounting of removable media is not overridden
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/1_8_7"
+            dest: "/tmp/audit/1_8_7"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/1_8_7
+
+        - name: Run audit script
+          shell: /tmp/audit/1_8_7
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.8.7 | {{ compliance_status }}"
+            result: "### 1.8.7 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 1.8.8 Ensure GDM autorun-never is enabled
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/1_8_8"
+            dest: "/tmp/audit/1_8_8"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/1_8_8
+
+        - name: Run audit script
+          shell: /tmp/audit/1_8_8
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.8.8 | {{ compliance_status }}"
+            result: "### 1.8.8 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 1.8.9 Ensure GDM autorun-never is not overridden
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/1_8_9"
+            dest: "/tmp/audit/1_8_9"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/1_8_9
+
+        - name: Run audit script
+          shell: /tmp/audit/1_8_9
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.8.9 | {{ compliance_status }}"
+            result: "### 1.8.9 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 1.8.10 Ensure XDCMP is not enabled
+      block:  
+        - name: Check /etc/gdm/custom.conf
+          shell: | 
+            grep -Eis '^\s*Enable\s*=\s*true' /etc/gdm/custom.conf | cat   
+          register: output
+          failed_when: output.rc == 2
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.8.10 | {{ compliance_status }}"
+            result: "### 1.8.10 \n```{{ audit_output.stdout }}\n```\n"

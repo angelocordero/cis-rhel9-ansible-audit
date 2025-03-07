@@ -1,0 +1,95 @@
+- name: Configure privilege escalation
+  block:
+    - name: 5.3.1 Ensure sudo is installed
+      block:
+        - name: Check if sudo is installed
+          shell: which sudo
+          register: which_output
+          failed_when: false
+          changed_when: false
+          
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if which_output.rc == 0 else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.3.1 | {{ compliance_status }}" 
+
+    - name: 5.3.2 Ensure sudo commands use pty
+      block:
+        - name: Check /etc/sudoers
+          shell: grep -rPi '^\h*Defaults\h+([^#\n\r]+,)?use_pty(,\h*\h+\h*)*\h*(#.*)?$' /etc/sudoers*
+          register: sudoers_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if sudoers_output.stdout == '/etc/sudoers:Defaults use_pty' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.3.2 | {{ compliance_status }}"       
+
+    - name: 5.3.3 Ensure sudo log file exists
+      block:
+        - name: Check /etc/sudoers
+          shell: grep -rPsi "^\h*Defaults\h+([^#]+,\h*)?logfile\h*=\h*(\"|\')?\H+(\"|\')?(,\h*\H+\h*)*\h*(#.*)?$" /etc/sudoers*
+          register: sudoers_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if sudoers_output.stdout == 'Defaults logfile=\"/var/log/sudo.log\"' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.3.3 | {{ compliance_status }}" 
+
+    - name: 5.3.5 Ensure re-authentication for privilege escalation is not disabled globally
+      block:
+        - name: Check /etc/sudoers
+          shell: grep -r "^[^#].*\!authenticate" /etc/sudoers*
+          register: sudoers_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Not Compliant' if '!authenticate' in sudoers_output.stdout else 'Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.3.5 | {{ compliance_status }}" 
+
+    - name: 5.3.7 Ensure access to the su command is restricted
+      block:
+        - name: Run grep to find pam_wheel.so configuration
+          shell: grep -Pi '^\h*auth\h+(?:required|requisite)\h+pam_wheel\.so\h+(?:[^#\n\r]+\h+)?((?!\2)(use_uid\b|group=\H+\b))\h+(?:[^#\n\r]+\h+)?((?!\1)(use_uid\b|group=\H+\b))(\h+.*)?$' /etc/pam.d/su
+          register: grep_output
+          failed_when: false
+          changed_when: false
+
+        - name: Extract group name from grep output
+          set_fact:
+            group_name: "{{ grep_output.stdout | regex_search('group=([^ ]+)', '\\1') }}"
+
+        - name: Check for users listed in the group
+          command: grep "{{ group_name }}" /etc/group
+          register: group_check_output
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if (group_check_output.stdout.split(':')[3] == '') else 'Not Compliant' }}"
+      
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.3.7 | {{ compliance_status }}"
+

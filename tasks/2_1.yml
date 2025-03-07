@@ -1,0 +1,41 @@
+- name: Time Synchronization
+  block: 
+    - name: 2.1.1 Ensure time synchronization is in use
+      block: 
+        - name: Check if Chrony is installed
+          shell: rpm -q chrony
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Not Compliant' if output.stdout == 'package chrony is not installed'  else 'Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.1.1 | {{ compliance_status }}"
+        
+    - name: 2.1.2 Ensure chrony is configured
+      block:
+        - name: Check /etc/chrony.conf
+          shell: grep -E "^(server|pool)" /etc/chrony.conf
+          register: chrony_output
+          failed_when: chrony_output.rc == 2
+          changed_when: false
+
+        - name: Check /etc/sysconfig/chronyd
+          shell: grep ^OPTIONS /etc/sysconfig/chronyd
+          register: chronyd_output
+          failed_when: chronyd_output.rc == 2
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if chrony_output.stdout != '' and '-u chrony' in chronyd_output.stdout else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.1.2 | {{ compliance_status }}"

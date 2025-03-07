@@ -1,0 +1,381 @@
+- name: Local User and Group Settings
+  block:
+    - name: 6.2.1 Ensure accounts in /etc/passwd use shadowed passwords
+      block:
+        - name: Check /etc/passwd
+          shell: |
+            awk -F: '($2 != "x" ) { print $1 " is not set to shadowed passwords "}' /etc/passwd
+          register: output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.1 | {{ compliance_status }}"     
+
+    - name: 6.2.2 Ensure /etc/shadow password fields are not empty
+      block:
+        - name: Check /etc/passwd
+          shell: |
+            awk -F: '($2 == "" ) { print $1 " does not have a password "}' /etc/shadow
+          register: output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.2 | {{ compliance_status }}"    
+
+    - name: 6.2.3 Ensure all groups in /etc/passwd exist in /etc/group
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/6_2_3"
+            dest: "/tmp/audit/6_2_3"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/6_2_3
+
+        - name: Run audit script
+          shell: /tmp/audit/6_2_3
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if audit_output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.3 | {{ compliance_status }}"
+            result: "### 6.2.3 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 6.2.4 Ensure no duplicate UIDs exist
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/6_2_4"
+            dest: "/tmp/audit/6_2_4"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/6_2_4
+
+        - name: Run audit script
+          shell: /tmp/audit/6_2_4
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if audit_output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.4 | {{ compliance_status }}"  
+            result: "### 6.2.4 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 6.2.5 Ensure no duplicate GIDs exist
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/6_2_5"
+            dest: "/tmp/audit/6_2_5"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/6_2_5
+
+        - name: Run audit script
+          shell: /tmp/audit/6_2_5
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if audit_output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.5 | {{ compliance_status }}"  
+            result: "### 6.2.5 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 6.2.6 Ensure no duplicate user names exist
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/6_2_6"
+            dest: "/tmp/audit/6_2_6"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/6_2_6
+
+        - name: Run audit script
+          shell: /tmp/audit/6_2_6
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if audit_output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.6 | {{ compliance_status }}"  
+            result: "### 6.2.6 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 6.2.7 Ensure no duplicate group names exist
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/6_2_7"
+            dest: "/tmp/audit/6_2_7"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/6_2_7
+
+        - name: Run audit script
+          shell: /tmp/audit/6_2_7
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if audit_output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.7 | {{ compliance_status }}"
+            result: "### 6.2.7 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 6.2.8 Ensure root PATH Integrity
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/6_2_8"
+            dest: "/tmp/audit/6_2_8"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/6_2_8
+
+        - name: Run audit script
+          shell: /tmp/audit/6_2_8
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if audit_output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.8 | {{ compliance_status }}"
+            result: "### 6.2.8 \n```\n{{ audit_output.stdout }}\n```\n"  
+
+    - name: 6.2.9 Ensure root is the only UID 0 account
+      block:
+        - name: Check /etc/passwd
+          shell: |
+            awk -F: '($3 == 0) { print $1 }' /etc/passwd
+          register: output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'root' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.9 | {{ compliance_status }}" 
+
+    - name: 6.2.10 Ensure local interactive user home directories exist
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/6_2_10"
+            dest: "/tmp/audit/6_2_10"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/6_2_10
+
+        - name: Run audit script
+          shell: /tmp/audit/6_2_10
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASSED' in audit_output.stdout else 'Not Compliant' if 'FAILED' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.10 | {{ compliance_status }}" 
+            result: "### 6.2.10 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 6.2.11 Ensure local interactive users own their home directories
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/6_2_11"
+            dest: "/tmp/audit/6_2_11"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/6_2_11
+
+        - name: Run audit script
+          shell: /tmp/audit/6_2_11
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASSED' in audit_output.stdout else 'Not Compliant' if 'FAILED' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.11 | {{ compliance_status }}" 
+            result: "### 6.2.11 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 6.2.12 Ensure local interactive user home directories are mode 750 or more restrictive
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/6_2_12"
+            dest: "/tmp/audit/6_2_12"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/6_2_12
+
+        - name: Run audit script
+          shell: /tmp/audit/6_2_12
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'Passed' in audit_output.stdout else 'Not Compliant' if 'Failed' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.12 | {{ compliance_status }}" 
+            result: "### 6.2.12 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 6.2.13 Ensure no local interactive user has .netrc files
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/6_2_13"
+            dest: "/tmp/audit/6_2_13"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/6_2_13
+
+        - name: Run audit script
+          shell: /tmp/audit/6_2_13
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASSED' in audit_output.stdout else 'WARNING' if 'WARNING' in audit_output.stdout else 'Not Compliant' if 'FAILED' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.13 | {{ compliance_status }}" 
+            result: "### 6.2.13 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 6.2.14 Ensure no local interactive user has .forward files
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/6_2_14"
+            dest: "/tmp/audit/6_2_14"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/6_2_14
+
+        - name: Run audit script
+          shell: /tmp/audit/6_2_14
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASSED' in audit_output.stdout else 'Not Compliant' if 'FAILED' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.14 | {{ compliance_status }}" 
+            result: "### 6.2.14 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 6.2.15 Ensure no local interactive user has .rhosts files
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/6_2_15"
+            dest: "/tmp/audit/6_2_15"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/6_2_15
+
+        - name: Run audit script
+          shell: /tmp/audit/6_2_15
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASSED' in audit_output.stdout else 'Not Compliant' if 'FAILED' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.15 | {{ compliance_status }}" 
+            result: "### 6.2.15 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 6.2.16 Ensure local interactive user dot files are not group or world writable
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/6_2_16"
+            dest: "/tmp/audit/6_2_16"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/6_2_16
+
+        - name: Run audit script
+          shell: /tmp/audit/6_2_16
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'Passed' in audit_output.stdout else 'Not Compliant' if 'Failed' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "6.2.16 | {{ compliance_status }}" 
+            result: "### 6.2.16 \n```{{ audit_output.stdout }}\n```\n"
+

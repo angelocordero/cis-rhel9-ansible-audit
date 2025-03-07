@@ -1,0 +1,15 @@
+---
+- name: Write compliance status to a local file
+  local_action:
+    module: lineinfile
+    path: logs/output_log_{{ ansible_hostname }}.md
+    line: "| {{ status }} |"
+    insertbefore: '## Count Summary'
+  when: status is defined
+
+- name: Write audit failure result
+  local_action:
+    module: lineinfile
+    path: logs/output_log_{{ ansible_hostname }}.md
+    line: "{{ result }}"
+  when: result is defined and ('Not Compliant' in status or 'Warning' in status or 'Unknown' in status)

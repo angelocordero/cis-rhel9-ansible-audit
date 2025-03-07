@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Run the grep command and capture the output
+output=$(grep -Ps '^\h*\$FileCreateMode\h+0[0,2,4,6][0,2,4]0\b' /etc/rsyslog.conf /etc/rsyslog.d/*.conf)
+
+# Check if the output includes 0640 or more restrictive permissions
+if echo "$output" | grep -qE '0[0,2,4,6]40'; then
+  echo "PASS"
+else
+  echo "FAIL"
+fi

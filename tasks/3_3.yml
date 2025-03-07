@@ -1,0 +1,227 @@
+- name: Network Parameters (Host and Router)
+  block:
+    - name: 3.3.1 Ensure source routed packets are not accepted
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/3_3_1"
+            dest: "/tmp/audit/3_3_1"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/3_3_1
+
+        - name: Run audit script
+          shell: /tmp/audit/3_3_1
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "3.3.1 | {{ compliance_status }}"
+            result: "### 3.3.1 \n```{{ audit_output.stdout }}\n```\n"
+
+
+    - name: 3.3.2 Ensure ICMP redirects are not accepted
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/3_3_2"
+            dest: "/tmp/audit/3_3_2"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/3_3_2
+
+        - name: Run audit script
+          shell: /tmp/audit/3_3_2
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "3.3.2 | {{ compliance_status }}"
+            result: "### 3.3.2 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 3.3.3 Ensure secure ICMP redirects are not accepted
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/3_3_3"
+            dest: "/tmp/audit/3_3_3"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/3_3_3
+
+        - name: Run audit script
+          shell: /tmp/audit/3_3_3
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "3.3.3 | {{ compliance_status }}"
+            result: "### 3.3.3 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 3.3.4 Ensure suspicious packets are logged
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/3_3_4"
+            dest: "/tmp/audit/3_3_4"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/3_3_4
+
+        - name: Run audit script
+          shell: /tmp/audit/3_3_4
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "3.3.4 | {{ compliance_status }}"
+            result: "### 3.3.4 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 3.3.5 Ensure broadcast ICMP requests are ignored
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/3_3_5"
+            dest: "/tmp/audit/3_3_5"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/3_3_5
+
+        - name: Run audit script
+          shell: /tmp/audit/3_3_5
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "3.3.5 | {{ compliance_status }}"
+            result: "### 3.3.5 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 3.3.6 Ensure bogus ICMP responses are ignored
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/3_3_6"
+            dest: "/tmp/audit/3_3_6"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/3_3_6
+
+        - name: Run audit script
+          shell: /tmp/audit/3_3_6
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "3.3.6 | {{ compliance_status }}"
+            result: "### 3.3.6 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 3.3.7 Ensure Reverse Path Filtering is enabled
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/3_3_7"
+            dest: "/tmp/audit/3_3_7"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/3_3_7
+
+        - name: Run audit script
+          shell: /tmp/audit/3_3_7
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "3.3.7 | {{ compliance_status }}"
+            result: "### 3.3.7 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 3.3.8 Ensure TCP SYN Cookies is enabled
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/3_3_8"
+            dest: "/tmp/audit/3_3_8"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/3_3_8
+
+        - name: Run audit script
+          shell: /tmp/audit/3_3_8
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "3.3.8 | {{ compliance_status }}"
+            result: "### 3.3.8 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 3.3.9 Ensure IPv6 router advertisements are not accepted
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/3_3_9"
+            dest: "/tmp/audit/3_3_9"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/3_3_9
+
+        - name: Run audit script
+          shell: /tmp/audit/3_3_9
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "3.3.9 | {{ compliance_status }}"
+            result: "### 3.3.9 \n```{{ audit_output.stdout }}\n```\n"

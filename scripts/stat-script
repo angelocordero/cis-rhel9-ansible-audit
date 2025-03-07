@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Check if the correct number of arguments is provided
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $0 <mode> <file>"
+  exit 1
+fi
+
+mode=$1
+file=$2
+
+# Get the current mode of the file
+current_mode=$(stat -c "%a" "$file")
+
+# Get the UID and GID of the file
+uid=$(stat -c "%u" "$file")
+gid=$(stat -c "%g" "$file")
+
+# Function to compare file modes
+compare_modes() {
+  required_mode=$1
+  actual_mode=$2
+
+  if [ "$required_mode" -eq 0 ]; then
+    [ "$actual_mode" -eq 0 ] && return 0 || return 1
+  else
+    [ "$((actual_mode & required_mode))" -eq "$required_mode" ] && return 0 || return 1
+  fi
+}
+
+# Check the file mode, UID, and GID
+if compare_modes "$mode" "$current_mode" && [ "$uid" -eq 0 ] && [ "$gid" -eq 0 ]; then
+  echo "PASS"
+else
+  echo "FAIL"
+fi

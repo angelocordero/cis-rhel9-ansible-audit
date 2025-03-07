@@ -1,0 +1,133 @@
+- name: Command Line Warning Banners
+  block: 
+    - name: 1.7.1 Ensure message of the day is configured properly
+      block:
+        - name: Check /etc/motd
+          shell: grep -E -i "(\\\v|\\\r|\\\m|\\\s|$(grep '^ID=' /etc/os-release | cut -d= -f2 | sed -e 's/\"//g'))" /etc/motd
+          register: output
+          failed_when: output.rc == 2
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.7.1 | {{ compliance_status }}"
+
+
+    - name: 1.7.2 Ensure local login warning banner is configured properly
+      block: 
+        - name: Check /etc/issue
+          shell: grep -E -i "(\\\v|\\\r|\\\m|\\\s|$(grep '^ID=' /etc/os-release | cut -d= -f2 | sed -e 's/\"//g'))" /etc/issue
+          register: output
+          failed_when: output.rc == 2
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.7.2 | {{ compliance_status }}"
+
+
+    - name: 1.7.3 Ensure remote login warning banner is configured properly
+      block: 
+        - name: Check /etc/issue.net
+          shell: grep -E -i "(\\\v|\\\r|\\\m|\\\s|$(grep '^ID=' /etc/os-release | cut -d= -f2 | sed -e 's/\"//g'))" /etc/issue.net
+          register: output
+          failed_when: output.rc == 2
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.7.3 | {{ compliance_status }}"
+
+
+    - name: 1.7.4 Ensure permissions on /etc/motd are configured
+      block: 
+        - name: Get file attributes of /etc/motd
+          stat: 
+            path: /etc/motd
+          register: motd_stat
+
+        - name: Verify file permissions, UID, and GID
+          assert:
+            that:
+              - motd_stat.stat.mode == '0644'
+              - motd_stat.stat.uid == 0
+              - motd_stat.stat.gid == 0
+          register: compliance_check
+          ignore_errors: yes
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{% if compliance_check.failed %}Not Compliant{% else %}Compliant{% endif %}"
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.7.4 | {{ compliance_status }}"
+
+
+    - name: 1.7.5 Ensure permissions on /etc/issue are configured
+      block: 
+        - name: Get file attributes of /etc/issue
+          stat: 
+            path: /etc/issue
+          register: issue_stat
+
+        - name: Verify file permissions, UID, and GID
+          assert:
+            that:
+              - issue_stat.stat.mode == '0644'
+              - issue_stat.stat.uid == 0
+              - issue_stat.stat.gid == 0
+          register: compliance_check
+          ignore_errors: yes
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{% if compliance_check.failed %}Not Compliant{% else %}Compliant{% endif %}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.7.5 | {{ compliance_status }}"
+
+
+    - name: 1.7.6 Ensure permissions on /etc/issue.net are configured
+      block: 
+        - name: Get file attributes of /etc/issue.net
+          stat: 
+            path: /etc/issue.net
+          register: issue_stat
+
+        - name: Verify file permissions, UID, and GID
+          assert:
+            that:
+              - issue_stat.stat.mode == '0644'
+              - issue_stat.stat.uid == 0
+              - issue_stat.stat.gid == 0
+          register: compliance_check
+          ignore_errors: yes
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{% if compliance_check.failed %}Not Compliant{% else %}Compliant{% endif %}"
+          
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "1.7.6 | {{ compliance_status }}"
+
+        

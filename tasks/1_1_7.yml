@@ -1,0 +1,36 @@
+- name: 1.1.7 Configure /home
+  block: 
+  - name: 1.1.7.2 Ensure nodev option set on /home partition
+    block:
+      - name: Check if nodev option is set on /home partition
+        shell: findmnt --kernel /home | grep nodev
+        register: audit_output
+        failed_when: "audit_output.rc == 2"
+        check_mode: no
+
+      - name: Set compliance status
+        set_fact:
+          compliance_status: "{{ 'Compliant' if output.stdout != '' else 'Not Compliant' }}"
+
+      - name: Log to file
+        include_tasks: ../logging.yml
+        vars:
+          status: "1.1.7.2 | {{ compliance_status }}"
+
+
+  - name: 1.1.7.3 Ensure nosuid option set on /home partition
+    block:
+      - name: Check if nosuid option is set on /home partition
+        shell: findmnt --kernel /home | grep nosuid
+        register: audit_output
+        failed_when: "audit_output.rc == 2"
+        check_mode: no
+
+      - name: Set compliance status
+        set_fact:
+          compliance_status: "{{ 'Compliant' if output.stdout != '' else 'Not Compliant' }}"
+
+      - name: Log to file
+        include_tasks: ../logging.yml
+        vars:
+          status: "1.1.7.3 | {{ compliance_status }}"

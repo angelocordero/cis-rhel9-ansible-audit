@@ -1,0 +1,24 @@
+- name: 1.1.9 Disable USB Storage
+  block:
+  - name: Copy audit script to host
+    copy:
+      src: "scripts/1_1_9"
+      dest: "/tmp/audit/1_1_9"
+      mode: '0755'
+
+  - name: Remove carriage return characters from the audit script
+    shell: sed -i 's/\r$//' /tmp/audit/1_1_9
+
+  - name: Run audit script
+    shell: /tmp/audit/1_1_9
+    register: audit_output 
+
+  - name: Set compliance status
+    set_fact:
+      compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+  - name: Log to file
+    include_tasks: ../logging.yml
+    vars:
+      status: "1.1.9 | {{ compliance_status }}"
+      result: "### 1.1.9 \n```{{ audit_output.stdout }}\n```\n"

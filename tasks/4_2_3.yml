@@ -1,0 +1,25 @@
+
+- name: 4.2.3 Ensure all logfiles have appropriate permissions and ownership
+  block:
+    - name: Copy audit script to host
+      copy:
+        src: "scripts/4_2_3"
+        dest: "/tmp/audit/4_2_3"
+        mode: '0755'
+
+    - name: Remove carriage return characters from the audit script
+      shell: sed -i 's/\r$//' /tmp/audit/4_2_3
+
+    - name: Run audit script
+      shell: /tmp/audit/4_2_3
+      register: audit_output 
+
+    - name: Set compliance status
+      set_fact:
+        compliance_status: "{{ 'Compliant' if 'Pass' in audit_output.stdout else 'Not Compliant' if 'Fail' in audit_output.stdout else 'Unknown' }}"
+
+    - name: Log to file
+      include_tasks: ../logging.yml
+      vars:
+        status: "4.2.3 | {{ compliance_status }}"
+        result: "### 4.2.3 \n```{{ audit_output.stdout }}\n```\n"

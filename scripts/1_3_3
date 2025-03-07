@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Run the grep command and store the output
+output=$(grep -Ps -- '(\/sbin\/(audit|au)\H*\b)' /etc/aide.conf.d/*.conf /etc/aide.conf)
+
+# Define the required lines
+required_lines=(
+    "/sbin/auditctl p+i+n+u+g+s+b+acl+xattrs+sha512"
+    "/sbin/auditd p+i+n+u+g+s+b+acl+xattrs+sha512"
+    "/sbin/ausearch p+i+n+u+g+s+b+acl+xattrs+sha512"
+    "/sbin/aureport p+i+n+u+g+s+b+acl+xattrs+sha512"
+    "/sbin/autrace p+i+n+u+g+s+b+acl+xattrs+sha512"
+    "/sbin/augenrules p+i+n+u+g+s+b+acl+xattrs+sha512"
+)
+
+# Initialize the status as FAIL
+status="FAIL"
+
+# Check if each required line is in the output
+for line in "${required_lines[@]}"; do
+    if ! echo "$output" | grep -q "$line"; then
+        status="FAIL"
+        break
+    else
+        status="PASS"
+    fi
+done
+
+# Print the final status
+echo "$status"

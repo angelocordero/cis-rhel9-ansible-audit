@@ -1,0 +1,410 @@
+- name: Configure SSH Server
+  block:
+    - name: 5.2.1 Ensure permissions on /etc/ssh/sshd_config are configured
+      block:
+       - name: Get file attributes of /etc/ssh/sshd_config
+         stat: 
+           path: /etc/ssh/sshd_config
+         register: sshd_config_stat
+
+       - name: Verify file permissions, UID, and GID
+         assert:
+           that:
+             - sshd_config_stat.stat.mode == '0600'
+             - sshd_config_stat.stat.uid == 0
+             - sshd_config_stat.stat.gid == 0
+         register: compliance_check
+         ignore_errors: yes
+
+       - name: Set compliance status
+         set_fact:
+           compliance_status: "{% if compliance_check.failed %}Not Compliant{% else %}Compliant{% endif %}"
+       - name: Log to file
+         include_tasks: ../logging.yml
+         vars:
+           status: "5.2.1 | {{ compliance_status }}"
+
+    - name: 5.2.2 Ensure permissions on SSH private host key files are configured
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/5_2_2"
+            dest: "/tmp/audit/5_2_2"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/5_2_2
+
+        - name: Run audit script
+          shell: /tmp/audit/5_2_2
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.2 | {{ compliance_status }}"  
+            result: "### 5.2.2 \n```{{ audit_output.stdout }}\n```\n" 
+
+    - name: 5.2.3 Ensure permissions on SSH public host key files are configured
+      block:  
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/5_2_3"
+            dest: "/tmp/audit/5_2_3"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/5_2_3
+
+        - name: Run audit script
+          shell: /tmp/audit/5_2_3
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.3 | {{ compliance_status }}"   
+            result: "### 5.2.3 \n```{{ audit_output.stdout }}\n```\n"
+
+    - name: 5.2.4 Ensure SSH access is limited
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/5_2_4"
+            dest: "/tmp/audit/5_2_4"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/5_2_4
+
+        - name: Run audit script
+          shell: /tmp/audit/5_2_4
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'PASS' in audit_output.stdout else 'Not Compliant' if 'FAIL' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.4 | {{ compliance_status }}"
+
+    - name: 5.2.5 Ensure SSH LogLevel is appropriate
+      block:
+        - name: Check sshd
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep loglevel
+          register: sshd_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check /etc/ssh/sshd_config
+          shell: grep -i 'loglevel' /etc/ssh/sshd_config | grep -Evi '(VERBOSE|INFO)'
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if config_output.stdout == '' and (sshd_output.stdout == 'loglevel VERBOSE' or sshd_output.stdout == 'loglevel INFO') else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.5 | {{ compliance_status }}"
+
+    - name: 5.2.6 Ensure SSH PAM is enabled
+      block:
+        - name: Check sshd
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep -i usepam
+          register: sshd_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check /etc/ssh/sshd_config
+          shell: grep -Ei '^\s*UsePAM\s+no' /etc/ssh/sshd_config
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if config_output.stdout == '' and sshd_output.stdout == 'usepam yes' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.6 | {{ compliance_status }}"
+
+    - name: 5.2.7 Ensure SSH root login is disabled
+      block:
+        - name: Check sshd
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep permitrootlogin
+          register: sshd_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check /etc/ssh/sshd_config
+          shell: grep -Ei '^\s*PermitRootLogin\s+yes' /etc/ssh/sshd_config
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if config_output.stdout == '' and sshd_output.stdout == 'permitrootlogin no' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.7 | {{ compliance_status }}"
+
+    - name: 5.2.8 Ensure SSH HostbasedAuthentication is disabled
+      block:
+        - name: Check sshd
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep hostbasedauthentication
+          register: sshd_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check /etc/ssh/sshd_config
+          shell: grep -Ei '^\s*HostbasedAuthentication\s+yes' /etc/ssh/sshd_config
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if config_output.stdout == '' and sshd_output.stdout == 'hostbasedauthentication no' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.8 | {{ compliance_status }}"
+
+    - name: 5.2.9 Ensure SSH HostbasedAuthentication is disabled
+      block:
+        - name: Check sshd
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep permitemptypasswords
+          register: sshd_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check /etc/ssh/sshd_config
+          shell: grep -Ei '^\s*PermitEmptyPasswords\s+yes' /etc/ssh/sshd_config
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if config_output.stdout == '' and sshd_output.stdout == 'permitemptypasswords no' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.9 | {{ compliance_status }}"
+
+    - name: 5.2.10 Ensure SSH PermitUserEnvironment is disabled
+      block:
+        - name: Check sshd
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep permituserenvironment
+          register: sshd_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check /etc/ssh/sshd_config
+          shell: grep -Ei '^\s*PermitUserEnvironment\s+yes' /etc/ssh/sshd_config
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if config_output.stdout == '' and sshd_output.stdout == 'permituserenvironment no' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.10 | {{ compliance_status }}"
+
+    - name: 5.2.11 Ensure SSH IgnoreRhosts is enabled
+      block:
+        - name: Check sshd
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep ignorerhosts
+          register: sshd_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check /etc/ssh/sshd_config
+          shell: grep -Ei '^\s*ignorerhosts\s+no\b' /etc/ssh/sshd_config
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if config_output.stdout == '' and sshd_output.stdout == 'ignorerhosts yes' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.11 | {{ compliance_status }}"
+
+    - name: 5.2.14 Ensure system-wide crypto policy is not over-ridden
+      block:
+        - name: Check /etc/ssh/sshd_config
+          shell: grep -i '^\s*CRYPTO_POLICY=' /etc/sysconfig/sshd
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if config_output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.14 | {{ compliance_status }}"
+
+    - name: 5.2.15 Ensure SSH warning banner is configured
+      block:
+        - name: Check /etc/ssh/sshd_config
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep banner
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if config_output.stdout == 'banner /etc/issue.net' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.15 | {{ compliance_status }}"
+
+    - name: 5.2.16 Ensure SSH MaxAuthTries is set to 4 or less
+      block:
+        - name: Check sshd
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep maxauthtries
+          register: sshd_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check /etc/ssh/sshd_config
+          shell: grep -Ei '^\s*maxauthtries\s+([5-9]|[1-9][0-9]+)' /etc/ssh/sshd_config
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if sshd_output.stdout is search('maxauthtries\\s+[0-4]') and config_output == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.16 | {{ compliance_status }}"
+
+    - name: 5.2.17 Ensure SSH MaxStartups is configured
+      block:
+        - name: Check sshd
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep -i maxstartups
+          register: sshd_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check /etc/ssh/sshd_config
+          shell: grep -Ei '^\s*maxstartups\s+(((1[1-9]|[1-9][0-9][0-9]+):([0-9]+):([0-9]+))|(([0-9]+):(3[1-9]|[4-9][0-9]|[1-9][0-9][0-9]+):([0-9]+))|(([0-9]+):([0-9]+):(6[1-9]|[7-9][0-9]|[1-9][0-9][0-9]+)))' /etc/ssh/sshd_config
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if config_output.stdout == '' and sshd_output.stdout == 'maxstartups 10:30:60' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.17 | {{ compliance_status }}"
+
+    - name: 5.2.18 Ensure SSH MaxSessions is set to 10 or less
+      block:
+        - name: Check sshd
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep -i maxsessions
+          register: sshd_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check /etc/ssh/sshd_config
+          shell: grep -Ei '^\s*MaxSessions\s+(1[1-9]|[2-9][0-9]|[1-9][0-9][0-9]+)' /etc/ssh/sshd_config
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if config_output.stdout == '' and sshd_output.stdout is search('maxsessions\\s+[0-10]') else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.18 | {{ compliance_status }}"
+
+    - name: 5.2.19 Ensure SSH LoginGraceTime is set to one minute or less
+      block:
+        - name: Check sshd
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep logingracetime
+          register: sshd_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check /etc/ssh/sshd_config
+          shell: grep -Ei '^\s*LoginGraceTime\s+(0|6[1-9]|[7-9][0-9]|[1-9][0-9][0-9]+|[^1]m)' /etc/ssh/sshd_config
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if config_output.stdout == '' and sshd_output.stdout is search('logingracetime\\s+[1-60]') else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.19 | {{ compliance_status }}"
+
+    - name: 5.2.20 Ensure SSH Idle Timeout Interval is configured
+      block:
+        - name: Check sshd
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep clientaliveinterval
+          register: sshd_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check /etc/ssh/sshd_config
+          shell: sshd -T -C user=root -C host="$(hostname)" -C addr="$(grep $(hostname) /etc/hosts | awk '{print $1}')" | grep clientalivecountmax
+          register: config_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if (config_output.stdout is search('clientalivecountmax\\s+\\d+') and config_output.stdout.split()[1]|int > 0) and (sshd_output.stdout is search('clientaliveinterval\\s+\\d+') and sshd_output.stdout.split()[1]|int > 0) else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.2.20 | {{ compliance_status }}"
+

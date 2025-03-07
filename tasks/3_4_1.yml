@@ -1,0 +1,43 @@
+- name: Configure a firewall utility
+  block:
+    - name: 3.4.1.1 Ensure nftables is installed
+      block: 
+        - name: Check if nftables is installed
+          shell: rpm -q nftables
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Not Compliant' if output.stdout == 'package nftables is not installed'  else 'Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "3.4.1.1 | {{ compliance_status }}"
+
+    - name: 3.4.1.2 Ensure a single firewall configuration utility is in use
+      block:
+        - name: Copy audit script to host
+          copy:
+            src: "scripts/3_4_1_2"
+            dest: "/tmp/audit/3_4_1_2"
+            mode: '0755'
+
+        - name: Remove carriage return characters from the audit script
+          shell: sed -i 's/\r$//' /tmp/audit/3_4_1_2
+
+        - name: Run audit script
+          shell: /tmp/audit/3_4_1_2
+          register: audit_output 
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'Pass' in audit_output.stdout else 'Not Compliant' if 'Fail' in audit_output.stdout else 'Unknown' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "3.4.1.2 | {{ compliance_status }}"
+            result: "### 3.4.1.2 \n```{{ audit_output.stdout }}\n```\n"

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Function to check if the mode is restrictive enough
+check_permissions() {
+    local filepath=$1
+    local required_mode=$2
+    local output
+    local permissions
+
+    output=$(stat -Lc "%n %#a %u/%U %g/%G" "$filepath")
+    permissions=$(echo "$output" | awk '{print $2}')
+
+    if [[ "$permissions" -le "$required_mode" ]]; then
+        echo "PASS: $output"
+        return 0
+    else
+        echo "FAIL: $output"
+        return 1
+    fi
+}
+
+# Check /boot/grub2/grub.cfg for mode 0700 or more restrictive
+check_permissions "/boot/grub2/grub.cfg" 0700
+grub_cfg_status=$?
+
+# Check /boot/grub2/grubenv for mode 0600 or more restrictive
+check_permissions "/boot/grub2/grubenv" 0600
+grubenv_status=$?
+
+# Check /boot/grub2/user.cfg for mode 0600 or more restrictive
+check_permissions "/boot/grub2/user.cfg" 0600
+user_cfg_status=$?
+
+# Determine the final status
+if [[ $grub_cfg_status -eq 0 && $grubenv_status -eq 0 && $user_cfg_status -eq 0 ]]; then
+    echo "PASS"
+else
+    echo "FAIL"
+fi

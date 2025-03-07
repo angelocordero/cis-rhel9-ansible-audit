@@ -1,0 +1,54 @@
+- name: 1.1.6 Configure /var/log/audit
+  block: 
+  - name: 1.1.6.2 Ensure noexec option set on /var/log/audit partition
+    block:
+      - name: Check if noexec option is set on /var/log/audit partition
+        shell: findmnt --kernel /var/log/audit | grep noexec
+        register: audit_output
+        failed_when: "audit_output.rc == 2"
+        check_mode: no
+
+      - name: Set compliance status
+        set_fact:
+          compliance_status: "{{ 'Compliant' if output.stdout != '' else 'Not Compliant' }}"
+
+      - name: Log to file
+        include_tasks: ../logging.yml
+        vars:
+          status: "1.1.6.2 | {{ compliance_status }}"
+
+
+  - name: 1.1.6.3 Ensure nodev option set on /var/log/audit partition
+    block:
+      - name: Check if nodev option is set on /var/log/audit partition
+        shell: findmnt --kernel /var/log/audit | grep nodev
+        register: audit_output
+        failed_when: "audit_output.rc == 2"
+        check_mode: no
+
+      - name: Set compliance status
+        set_fact:
+          compliance_status: "{{ 'Compliant' if output.stdout != '' else 'Not Compliant' }}"
+
+      - name: Log to file
+        include_tasks: ../logging.yml
+        vars:
+          status: "1.1.6.3 | {{ compliance_status }}"
+
+
+  - name: 1.1.6.4 Ensure nosuid option set on /var/log/audit partition
+    block:
+      - name: Check if nosuid option is set on /var/log/audit partition
+        shell: findmnt --kernel /var/log/audit | grep nosuid
+        register: audit_output
+        failed_when: "audit_output.rc == 2"
+        check_mode: no
+
+      - name: Set compliance status
+        set_fact:
+          compliance_status: "{{ 'Compliant' if output.stdout != '' else 'Not Compliant' }}"
+
+      - name: Log to file
+        include_tasks: ../logging.yml
+        vars:
+          status: "1.1.6.4 | {{ compliance_status }}"

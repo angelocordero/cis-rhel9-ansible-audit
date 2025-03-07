@@ -1,0 +1,16 @@
+- name: Ensure system-wide crypto policy is not legacy
+  block:
+  - name: 1.10 Ensure system-wide crypto policy is not legacy
+    shell: grep -E -i '^\s*LEGACY\s*(\s+#.*)?$' /etc/crypto-policies/config
+    register: output
+    failed_when: "output.rc == 2"
+    check_mode: no
+   
+  - name: Set compliance status
+    set_fact:
+      compliance_status: "{{ 'Compliant' if output.stdout == '' else 'Not Compliant' }}"
+
+  - name: Log to file
+    include_tasks: ../logging.yml
+    vars:
+      status: "1.10 | {{ compliance_status }}"

@@ -1,0 +1,348 @@
+- name: Special Purpose Services
+  block:
+    - name: 2.2.2 Ensure Avahi Server is not installed
+      block: 
+        - name: Check if Avahi is installed
+          shell: rpm -q avahi
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package avahi is not installed' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.2 | {{ compliance_status }}"
+
+    - name: 2.2.3 Ensure CUPS Server is not installed
+      block: 
+        - name: Check if CUPS is installed
+          shell: rpm -q cups
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package cups is not installed' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.3 | {{ compliance_status }}"
+
+    - name: 2.2.3 Ensure CUPS Server is not installed
+      block: 
+        - name: Check if CUPS is installed
+          shell: rpm -q cups
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package cups is not installed' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.3 | {{ compliance_status }}"
+
+    - name: 2.2.4 Ensure DHCP Server is not installed
+      block: 
+        - name: Check if DHCP Server is installed
+          shell: rpm -q dhcp-server
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package dhcp-server is not installed' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.4 | {{ compliance_status }}"
+
+    - name: 2.2.5 Ensure DNS Server is not installed
+      block: 
+        - name: Check if DNS is installed
+          shell: rpm -q bind
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package bind is not installed' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.5 | {{ compliance_status }}"
+
+    - name: 2.2.6 Ensure VSFTPD Server is not installed
+      block: 
+        - name: Check if VSFTPD is installed
+          shell: rpm -q vsftpd
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package vsftpd is not installed' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.6 | {{ compliance_status }}"
+
+    - name: 2.2.7 Ensure TFTP Server is not installed
+      block: 
+        - name: Check if TFTP Server is installed
+          shell: rpm -q tftp-server
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package tftp-server is not installed' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.7 | {{ compliance_status }}"
+
+    - name: 2.2.8 Ensure a web server is not installed
+      block: 
+        - name: Check if httpd and nginx is installed
+          shell: rpm -q httpd nginx
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'package httpd is not installed' in output.stdout and 'package nginx is not installed' in output.stdout else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.8 | {{ compliance_status }}"
+
+    - name: 2.2.9 Ensure IMAP and POP3 server is not installed
+      block: 
+        - name: Check if IMAP and POP3 servers are installed
+          shell: rpm -q dovecot cyrus-imapd
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'package dovecot is not installed' in output.stdout and 'package cyrus-imapd is not installed' in output.stdout else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.9 | {{ compliance_status }}"
+
+    - name: 2.2.10 Ensure Samba is not installed
+      block: 
+        - name: Check if Samba is installed
+          shell: rpm -q samba
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package samba is not installed' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.10 | {{ compliance_status }}"
+
+    - name: 2.2.11 Ensure HTTP Proxy Server is not installed
+      block: 
+        - name: Check if HTTP Proxy Server is installed
+          shell: rpm -q squid
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package squid is not installed' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.11 | {{ compliance_status }}"
+
+    - name: 2.2.12 Ensure net-snmp is not installed
+      block: 
+        - name: Check if net-snmp is installed
+          shell: rpm -q net-snmp
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package net-snmp is not installed' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.12 | {{ compliance_status }}"
+
+    - name: 2.2.13 Ensure telnet-server is not installed
+      block: 
+        - name: Check if telnet-server is installed
+          shell: rpm -q telnet-server
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package telnet-server is not installed' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.13 | {{ compliance_status }}"
+
+    - name: 2.2.7 Ensure TFTP Server is not installed
+      block: 
+        - name: Check if TFTP Server is installed
+          shell: rpm -q tftp-server
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package tftp-server is not installed' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.7 | {{ compliance_status }}"
+
+    - name: 2.2.14 Ensure dnsmasq is not installed
+      block: 
+        - name: Check if dnsmasq is installed
+          shell: rpm -q dnsmasq
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package dnsmasq is not installed' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.14 | {{ compliance_status }}"
+
+    - name: 2.2.15 Ensure mail transfer agent is configured for local-only mode
+      block: 
+        - name: Check if the MTA is not listening on any non-loopback address
+          shell: ss -lntu | grep -E ':25\s' | grep -E -v '\s(127.0.0.1|\[?::1\]?):25\s'
+          register: output
+          failed_when: output.rc == 2
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.15 | {{ compliance_status }}"
+
+    - name: 2.2.16 Ensure nfs-utils is not installed or the nfs-server service is masked
+      block: 
+        - name: Check if nfs-utils is installed
+          shell: rpm -q nfs-utils
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+
+        - name: Check if nfs-server service is masked
+          shell: systemctl is-enabled nfs-server
+          register: systemctl_output
+          failed_when: systemctl_output.rc == 2
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package nfs-utils is not installed' or systemctl_output.stdout == 'masked' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.16 | {{ compliance_status }}"
+
+    - name: 2.2.17 Ensure rcpbind is not installed or the rcpbind services are masked
+      block: 
+        - name: Check if rcpbind is installed
+          shell: rpm -q rcpbind
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+
+        - name: Check if rcpbind service is masked
+          shell: systemctl is-enabled rcpbind
+          register: rcpbind_output
+          failed_when: rcpbind_output.rc == 2
+          changed_when: false
+
+        - name: Check if rcpbind.socket service is masked
+          shell: systemctl is-enabled rcpbind
+          register: systemctl_output
+          failed_when: systemctl_output.rc == 2
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package nfs-utils is not installed' or (systemctl_output.stdout == 'masked' and rcpbind_output.stdout == 'masked') else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.17 | {{ compliance_status }}"
+
+    - name: 2.2.18 Ensure rsync-daemon is not installed or the rsyncd service is masked
+      block: 
+        - name: Check if rsync-daemon is installed
+          shell: rpm -q rsync-daemon
+          register: output
+          failed_when: output.stdout == ''
+          changed_when: false
+
+        - name: Check if rsyncd service is masked
+          shell: systemctl is-enabled rsyncd
+          register: systemctl_output
+          failed_when: systemctl_output.rc == 2
+          changed_when: false
+      
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if output.stdout == 'package rsync-daemon is not installed' or systemctl_output.stdout == 'masked' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "2.2.18 | {{ compliance_status }}"

@@ -1,0 +1,14 @@
+---
+- name: CIS Redhat Enterprise Linux 9 Audit
+  hosts: all
+  remote_user: ansible
+  become: yes
+  gather_facts: yes
+  tasks: 
+    - include_tasks: "pre_audit_tasks.yml"
+    
+    - include_tasks: "{{ item }}"
+      with_fileglob:
+        - tasks/*.yml
+
+- import_playbook: "post_audit_tasks.yml"

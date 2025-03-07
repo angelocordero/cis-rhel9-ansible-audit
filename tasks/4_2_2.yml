@@ -1,0 +1,71 @@
+- name: Configure journald
+  block:
+    - name: 4.2.2.2 Ensure journald service is enabled
+      block:
+        - name: Check if systemd-journald.service is enabled
+          shell: systemctl is-enabled systemd-journald.service
+          register: systemctl_output
+          failed_when: systemctl_output.rc == 2
+          changed_when: false     
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if systemctl_output.stdout == 'static' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "4.2.2.2 | {{ compliance_status }}"      
+
+    - name: 4.2.2.3 Ensure journald is configured to compress large log files
+      block:
+        - name: Check journald.conf
+          shell: grep ^\s*Compress /etc/systemd/journald.conf
+          register: output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'Compress=yes' in systemctl_output.stdout else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "4.2.2.3 | {{ compliance_status }}"  
+
+    - name: 4.2.2.4 Ensure journald is configured to write logfiles to persistent disk
+      block:
+        - name: Check journald.conf
+          shell: grep ^\s*Storage /etc/systemd/journald.conf
+          register: output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if 'Storage=persistent' in systemctl_output.stdout else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "4.2.2.4 | {{ compliance_status }}" 
+
+    - name: 4.2.2.1.4 Ensure journald is not configured to receive logs from a remote client
+      block: 
+        - name: Check if systemd-journal-remote.socket is not enabled
+          shell: systemctl is-enabled systemd-journal-remote.socket
+          register: output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if systemctl_output.stdout == 'masked' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "4.2.2.1.4 | {{ compliance_status }}"         
+
+                

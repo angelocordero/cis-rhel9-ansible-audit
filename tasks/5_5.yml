@@ -1,0 +1,76 @@
+- name: Configure PAM
+  block:
+    - name: 5.5.2 Ensure lockout for failed password attempts is configured
+      block:
+        - name: Check the number of failed logon attempts before the account is locked
+          shell: grep -E '^\s*deny\s*=\s*[1-5]\b' /etc/security/faillock.conf
+          register: attempts_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check the time in seconds before the account is unlocked
+          shell: grep -E '^\s*unlock_time\s*=\s*(0|9[0-9][0-9]|[1-9][0-9][0-9][0-9]+)\b' /etc/security/faillock.conf
+          register: time_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance_status: "{{ 'Compliant' if (time_output.stdout | regex_search(\"unlock_time\\s*=\\s*(0|[9-9]\\d{2,}|[1-9]\\d{3,})\")) and (attempts_output.stdout | regex_search(\"deny\\s*=\\s*(?:[0-4]|\b5\b)\")) else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.5.2 | {{ compliance_status }}"
+
+    - name: 5.5.3 Ensure password reuse is limited
+      block:
+        - name: Check remembered password history
+          shell: grep -P '^\\h*password\\h+(requisite|sufficient)\\h+(pam_pwhistory\\.so|pam_unix\\.so)\\h+([^#\n\r]+\\h+)?remember=([5-9]|[1-9][0-9]+)\\h*(\\h+.*)?$' /etc/pam.d/systemauth
+          register: remember_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance: >-
+              {{
+                'Compliant' if (
+                  remember_output.stdout.split() | map('regex_search', 'remember=(\\d+)') | select('match', '^\\d+$') | map('int') | select('ge', 5) | list | length == remember_output.stdout.split() | length
+                ) else 'Non-compliant'
+              }}
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.5.3 | {{ compliance_status }}"
+
+    - name: 5.5.4 Ensure password hashing algorithm is SHA-512 or yescrypt
+      block:
+        - name: Check /etc/libuser.conf
+          shell: grep -Ei '^\s*crypt_style\s*=\s*(sha512|yescrypt)\b' /etc/libuser.conf
+          register: libuser_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check /etc/login.defs
+          shell: grep -Ei '^\s*ENCRYPT_METHOD\s+(SHA512|yescrypt)\b' /etc/login.defs
+          register: logindefs_output
+          failed_when: false
+          changed_when: false
+
+        - name: Check PAM
+          shell: grep -P -- '^\h*password\h+(requisite|required|sufficient)\h+pam_unix\.so(\h+[^#\n\r]+)?\h+(sha512|yescrypt)\b.*$' /etc/pam.d/password-auth /etc/pam.d/system-auth
+          register: pam_output
+          failed_when: false
+          changed_when: false
+
+        - name: Set compliance status
+          set_fact:
+            compliance: "{{ 'Compliant' if libuser_output.stdout != '' and logindefs_output.stdout != '' and pam_output.stdout != '' else 'Not Compliant' }}"
+
+        - name: Log to file
+          include_tasks: ../logging.yml
+          vars:
+            status: "5.5.4 | {{ compliance_status }}"
+            
