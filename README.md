@@ -9,6 +9,10 @@ Ansible playbook for the [CIS RHEL9 Benchmark](https://www.cisecurity.org/benchm
 4. Run the playbook using the command `ansible-playbook -i /path/to/your/inventory/file audit.yml -Kk`
 	Note: the `-Kk` flag will ask you for the SSH password and the become password (so the playbook can be executed as root)
 
+## Example Output
+![example1](https://github.com/user-attachments/assets/7ae3eff3-fead-4dc8-800a-7219349fc3f6)
+![example2](https://github.com/user-attachments/assets/5480e669-b747-4d2c-ba0b-c2de8e24a3bc)
+
 ## Versions
 This playbook was written and tested on `ansible [core 2.14.17]`
 
