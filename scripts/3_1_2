@@ -7,8 +7,7 @@ module_chk()
 # Check how module will be loaded
 l_loadable="$(modprobe -n -v "$l_mname")"
 if grep -Pq -- '^\h*install \/bin\/(true|false)' <<< "$l_loadable"; then
-l_output="$l_output\n - module: \"$l_mname\" is not loadable:
-\"$l_loadable\""
+l_output="$l_output\n - module: \"$l_mname\" is not loadable: \"$l_loadable\""
 else
 l_output2="$l_output2\n - module: \"$l_mname\" is loadable: \"$l_loadable\""
 fi
@@ -39,8 +38,7 @@ else
 echo -e "\n$l_output\n"
 fi
 else
-echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit
-failure:\n$l_output2\n"
+echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
 [ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
 fi
 }
